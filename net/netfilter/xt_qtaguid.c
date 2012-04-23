@@ -1207,11 +1207,11 @@ static struct sock_tag *get_sock_stat(const struct sock *sk)
 static int ipx_proto(const struct sk_buff *skb,
 		     struct xt_action_param *par)
 {
-	int thoff, tproto;
+	int thoff = 0, tproto;
 
 	switch (par->family) {
 	case NFPROTO_IPV6:
-		tproto = ipv6_find_hdr(skb, &thoff, -1, NULL);
+		tproto = ipv6_find_hdr(skb, &thoff, -1, NULL, NULL);
 		if (tproto < 0)
 			MT_DEBUG("%s(): transport header not found in ipv6"
 				 " skb=%p\n", __func__, skb);
