@@ -1329,6 +1329,12 @@ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int proto, g
 	return sk;
 }
 
+bool l2cap_is_socket(struct socket *sock)
+{
+	return sock && sock->ops == &l2cap_sock_ops;
+}
+EXPORT_SYMBOL(l2cap_is_socket);
+
 static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
 			     int kern)
 {
