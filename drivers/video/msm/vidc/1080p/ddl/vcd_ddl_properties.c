@@ -219,6 +219,13 @@ static u32 ddl_set_dec_property(struct ddl_client_context *ddl,
 			(ddl_valid_buffer_requirement(
 			&decoder->min_input_buf_req, buffer_req))) {
 			decoder->client_input_buf_req = *buffer_req;
+			DDL_MSG_HIGH("set DDL_IN_BUF_REQ: min = %u, "\
+				"max = %u, act = %u, size = %u, align = %u, "\
+				"buf_pool_id = %u, meta_buf_size = %u",
+				buffer_req->min_count, buffer_req->max_count,
+				buffer_req->actual_count, buffer_req->sz,
+				buffer_req->align, buffer_req->buf_pool_id,
+				buffer_req->meta_buffer_size);
 			vcd_status = VCD_S_SUCCESS;
 		}
 	}
@@ -236,9 +243,15 @@ static u32 ddl_set_dec_property(struct ddl_client_context *ddl,
 			DDLCLIENT_STATE_IS(ddl, DDL_CLIENT_OPEN)) &&
 			(ddl_valid_buffer_requirement(
 			&decoder->min_output_buf_req, buffer_req))) {
-				decoder->client_output_buf_req =
-					*buffer_req;
-				vcd_status = VCD_S_SUCCESS;
+			decoder->client_output_buf_req = *buffer_req;
+			DDL_MSG_HIGH("set DDL_OUT_BUF_REQ: min = %u, "\
+				"max = %u, act = %u, size = %u, align = %u, "\
+				"buf_pool_id = %u, meta_buf_size = %u",
+				buffer_req->min_count, buffer_req->max_count,
+				buffer_req->actual_count, buffer_req->sz,
+				buffer_req->align, buffer_req->buf_pool_id,
+				buffer_req->meta_buffer_size);
+			vcd_status = VCD_S_SUCCESS;
 		}
 	}
 	break;
@@ -292,7 +305,7 @@ static u32 ddl_set_dec_property(struct ddl_client_context *ddl,
 				decoder->adaptive_width = decoder->client_frame_size.width;
 				decoder->adaptive_height = decoder->client_frame_size.height;
 			}
-			DDL_MSG_LOW("set VCD_I_FRAME_SIZE width = %d"
+			DDL_MSG_HIGH("set VCD_I_FRAME_SIZE width = %d"
 				" height = %d\n",
 				frame_size->width, frame_size->height);
 			vcd_status = VCD_S_SUCCESS;
@@ -1190,6 +1203,9 @@ static u32 ddl_get_dec_property(struct ddl_client_context *ddl,
 			*(struct vcd_property_frame_size *)
 				property_value =
 					decoder->client_frame_size;
+			DDL_MSG_HIGH("get VCD_I_FRAME_SIZE WxH = %ux%u, "\
+				"SxSH = %ux%u", fz_size->width, fz_size->height,
+				fz_size->stride, fz_size->scan_lines);
 			vcd_status = VCD_S_SUCCESS;
 		}
 	break;
@@ -1222,6 +1238,17 @@ static u32 ddl_get_dec_property(struct ddl_client_context *ddl,
 			*(struct vcd_buffer_requirement *)
 				property_value =
 					decoder->client_input_buf_req;
+			DDL_MSG_HIGH("get DDL_IN_BUF_REQ: min = %u, "\
+				"max = %u, act = %u, size = %u, "\
+				"align = %u, buf_pool_id = %u, "\
+				"meta_buf_size = %u",
+				decoder->client_input_buf_req.min_count,
+				decoder->client_input_buf_req.max_count,
+				decoder->client_input_buf_req.actual_count,
+				decoder->client_input_buf_req.sz,
+				decoder->client_input_buf_req.align,
+				decoder->client_input_buf_req.buf_pool_id,
+				decoder->client_input_buf_req.meta_buffer_size);
 			vcd_status = VCD_S_SUCCESS;
 		}
 	break;
@@ -1230,7 +1257,17 @@ static u32 ddl_get_dec_property(struct ddl_client_context *ddl,
 			property_hdr->sz) {
 				*(struct vcd_buffer_requirement *)
 			property_value = decoder->client_output_buf_req;
-				vcd_status = VCD_S_SUCCESS;
+			DDL_MSG_HIGH("get DDL_OUT_BUF_REQ: min = %u, "\
+			"max = %u, act = %u, size = %u, align = %u, "\
+			"buf_pool_id = %u, meta_buf_size = %u",
+			decoder->client_output_buf_req.min_count,
+			decoder->client_output_buf_req.max_count,
+			decoder->client_output_buf_req.actual_count,
+			decoder->client_output_buf_req.sz,
+			decoder->client_output_buf_req.align,
+			decoder->client_output_buf_req.buf_pool_id,
+			decoder->client_output_buf_req.meta_buffer_size);
+			vcd_status = VCD_S_SUCCESS;
 		}
 	break;
 	case VCD_I_CODEC:
@@ -1315,7 +1352,7 @@ static u32 ddl_get_dec_property(struct ddl_client_context *ddl,
 		break;
 	case VCD_I_METADATA_ENABLE:
 	case VCD_I_METADATA_HEADER:
-		DDL_MSG_ERROR("Meta Data Interface is Requested");
+		DDL_MSG_HIGH("Meta Data Interface is Requested");
 		vcd_status = ddl_get_metadata_params(ddl, property_hdr,
 			property_value);
 		vcd_status = VCD_S_SUCCESS;
