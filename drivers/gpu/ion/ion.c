@@ -1364,21 +1364,16 @@ int ion_share_dma_buf_fd(struct ion_client *client, struct ion_handle *handle)
 }
 EXPORT_SYMBOL(ion_share_dma_buf_fd);
 
-struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd)
+struct ion_handle *ion_dma_buf_to_handle(struct ion_client *client,
+					 struct dma_buf *dmabuf)
 {
-	struct dma_buf *dmabuf;
 	struct ion_buffer *buffer;
 	struct ion_handle *handle;
 
-	dmabuf = dma_buf_get(fd);
-	if (IS_ERR_OR_NULL(dmabuf))
-		return ERR_PTR(PTR_ERR(dmabuf));
 	/* if this memory came from ion */
-
 	if (dmabuf->ops != &dma_buf_ops) {
 		pr_err("%s: can not import dmabuf from another exporter\n",
 		       __func__);
-		dma_buf_put(dmabuf);
 		return ERR_PTR(-EINVAL);
 	}
 	buffer = dmabuf->priv;
@@ -1396,6 +1391,21 @@ struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd)
 	ion_handle_add(client, handle);
 end:
 	mutex_unlock(&client->lock);
+	return handle;
+
+}
+EXPORT_SYMBOL(ion_dma_buf_to_handle);
+
+struct ion_handle *ion_import_dma_buf(struct ion_client *client, int fd)
+{
+	struct dma_buf *dmabuf;
+	struct ion_handle *handle;
+
+	dmabuf = dma_buf_get(fd);
+	if (IS_ERR_OR_NULL(dmabuf))
+		return ERR_PTR(PTR_ERR(dmabuf));
+
+	handle = ion_dma_buf_to_handle(client, dmabuf);
 	dma_buf_put(dmabuf);
 	return handle;
 }

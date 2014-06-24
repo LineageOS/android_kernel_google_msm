@@ -2,7 +2,7 @@
  * include/linux/ion.h
  *
  * Copyright (C) 2011 Google, Inc.
- * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2012, 2014 The Linux Foundation. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -386,6 +386,10 @@ int ion_unsecure_heap(struct ion_device *dev, int heap_id, int version,
 int msm_ion_do_cache_op(struct ion_client *client, struct ion_handle *handle,
 			void *vaddr, unsigned long len, unsigned int cmd);
 
+
+
+struct ion_handle *ion_dma_buf_to_handle(struct ion_client *client,
+					 struct dma_buf *dmabuf);
 #else
 static inline void ion_reserve(struct ion_platform_data *data)
 {
@@ -492,6 +496,14 @@ static inline int msm_ion_do_cache_op(struct ion_client *client,
 {
 	return -ENODEV;
 }
+
+static inline struct ion_handle *ion_dma_buf_to_handle(
+					struct ion_client *client,
+					struct dma_buf *dmabuf)
+{
+	return ERR_PTR(-ENODEV);
+}
+
 
 #endif /* CONFIG_ION */
 #endif /* __KERNEL__ */
