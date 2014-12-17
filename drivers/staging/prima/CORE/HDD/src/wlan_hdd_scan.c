@@ -85,6 +85,8 @@
 #include <linux/wireless.h>
 #include <net/cfg80211.h>
 
+#include <vos_sched.h>
+
 #define GET_IE_LEN_IN_BSS(lenInBss) ( lenInBss + sizeof(lenInBss) - \
               ((int) OFFSET_OF( tSirBssDescription, ieFields)))
 
@@ -618,7 +620,7 @@ static eHalStatus hdd_ScanRequestCallback(tHalHandle halHandle, void *pContext,
 
 /**---------------------------------------------------------------------------
 
-  \brief iw_set_scan() -
+  \brief __iw_set_scan() -
 
    This function process the scan request from the wpa_supplicant
    and set the scan request to the SME
@@ -632,7 +634,7 @@ static eHalStatus hdd_ScanRequestCallback(tHalHandle halHandle, void *pContext,
   --------------------------------------------------------------------------*/
 
 
-int iw_set_scan(struct net_device *dev, struct iw_request_info *info,
+int __iw_set_scan(struct net_device *dev, struct iw_request_info *info,
                  union iwreq_data *wrqu, char *extra)
 {
    hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR(dev) ;
@@ -792,9 +794,21 @@ error:
    return status;
 }
 
+int iw_set_scan(struct net_device *dev, struct iw_request_info *info,
+                union iwreq_data *wrqu, char *extra)
+{
+   int ret;
+
+   vos_ssr_protect(__func__);
+   ret = __iw_set_scan(dev, info, wrqu, extra);
+   vos_ssr_unprotect(__func__);
+
+   return ret;
+}
+
 /**---------------------------------------------------------------------------
 
-  \brief iw_get_scan() -
+  \brief __iw_get_scan() -
 
    This function returns the scan results to the wpa_supplicant
 
@@ -807,7 +821,7 @@ error:
   --------------------------------------------------------------------------*/
 
 
-int iw_get_scan(struct net_device *dev,
+int __iw_get_scan(struct net_device *dev,
                          struct iw_request_info *info,
                          union iwreq_data *wrqu, char *extra)
 {
@@ -875,6 +889,19 @@ int iw_get_scan(struct net_device *dev,
    EXIT();
    VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO, "%s: exit total %d BSS reported !!!",__func__, i);
    return status;
+}
+
+int iw_get_scan(struct net_device *dev,
+                struct iw_request_info *info,
+                union iwreq_data *wrqu, char *extra)
+{
+    int ret;
+
+    vos_ssr_protect(__func__);
+    ret = __iw_get_scan(dev, info, wrqu, extra);
+    vos_ssr_unprotect(__func__);
+
+    return ret;
 }
 
 #if 0

@@ -63,6 +63,7 @@
 #include <linux/etherdevice.h>
 //#include <vos_list.h>
 #include <vos_types.h>
+#include <vos_sched.h>
 #include <aniGlobal.h>
 #include <halTypes.h>
 #include <net/ieee80211_radiotap.h>
@@ -505,14 +506,14 @@ xmit_end:
 }
 
 /**============================================================================
-  @brief hdd_softap_tx_timeout() - Function called by OS if there is any
+  @brief __hdd_softap_tx_timeout() - Function called by OS if there is any
   timeout during transmission. Since HDD simply enqueues packet
   and returns control to OS right away, this would never be invoked
 
   @param dev : [in] pointer to Libra network device
   @return    : None
   ===========================================================================*/
-void hdd_softap_tx_timeout(struct net_device *dev)
+void __hdd_softap_tx_timeout(struct net_device *dev)
 {
    VOS_TRACE( VOS_MODULE_ID_HDD_SOFTAP, VOS_TRACE_LEVEL_ERROR,
       "%s: Transmission timeout occurred", __func__);
@@ -520,23 +521,39 @@ void hdd_softap_tx_timeout(struct net_device *dev)
    //disabled either because of disassociation or low resource scenarios. In
    //case of disassociation it is ok to ignore this. But if associated, we have
    //do possible recovery here
-} 
+}
 
+void hdd_softap_tx_timeout(struct net_device *dev)
+{
+   vos_ssr_protect(__func__);
+   __hdd_softap_tx_timeout(dev);
+   vos_ssr_unprotect(__func__);
+   return;
+}
 
 /**============================================================================
-  @brief hdd_softap_stats() - Function registered with the Linux OS for 
+  @brief __hdd_softap_stats() - Function registered with the Linux OS for 
   device TX/RX statistic
 
   @param dev      : [in] pointer to Libra network device
   
   @return         : pointer to net_device_stats structure
   ===========================================================================*/
-struct net_device_stats* hdd_softap_stats(struct net_device *dev)
+struct net_device_stats* __hdd_softap_stats(struct net_device *dev)
 {
    hdd_adapter_t* priv = netdev_priv(dev);
    return &priv->stats;
 }
 
+struct net_device_stats* hdd_softap_stats(struct net_device *dev)
+{
+   struct net_device_stats *priv_stats;
+   vos_ssr_protect(__func__);
+   priv_stats = __hdd_softap_stats(dev);
+   vos_ssr_unprotect(__func__);
+
+   return priv_stats;
+}
 
 /**============================================================================
   @brief hdd_softap_init_tx_rx() - Init function to initialize Tx/RX
