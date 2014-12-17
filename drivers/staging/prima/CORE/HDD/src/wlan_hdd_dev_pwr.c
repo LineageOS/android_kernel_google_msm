@@ -61,6 +61,7 @@
  * Include Files
  * -------------------------------------------------------------------------*/
 #include <wlan_hdd_dev_pwr.h>
+#include <vos_sched.h>
 #ifdef ANI_BUS_TYPE_PLATFORM
 #include <linux/wcnss_wlan.h>
 #else
@@ -336,7 +337,7 @@ static void wlan_resume(hdd_context_t* pHddCtx)
    @return None
 
 ----------------------------------------------------------------------------*/
-int hddDevSuspendHdlr(struct device *dev)
+int __hddDevSuspendHdlr(struct device *dev)
 {
    int ret = 0;
    hdd_context_t* pHddCtx = NULL;
@@ -375,6 +376,16 @@ int hddDevSuspendHdlr(struct device *dev)
    return 0;
 }
 
+int hddDevSuspendHdlr(struct device *dev)
+{
+    int ret;
+    vos_ssr_protect(__func__);
+    ret = __hddDevSuspendHdlr(dev);
+    vos_ssr_unprotect(__func__);
+
+    return ret;
+}
+
 /*----------------------------------------------------------------------------
 
    @brief Function to resume the wlan driver.
@@ -386,7 +397,7 @@ int hddDevSuspendHdlr(struct device *dev)
    @return None
 
 ----------------------------------------------------------------------------*/
-int hddDevResumeHdlr(struct device *dev)
+int __hddDevResumeHdlr(struct device *dev)
 {
    hdd_context_t* pHddCtx = NULL;
 
@@ -411,6 +422,17 @@ int hddDevResumeHdlr(struct device *dev)
 #endif
 
    return 0;
+}
+
+int hddDevResumeHdlr(struct device *dev)
+{
+    int ret;
+
+    vos_ssr_protect(__func__);
+    ret = __hddDevResumeHdlr(dev);
+    vos_ssr_unprotect(__func__);
+
+    return ret;
 }
 
 static const struct dev_pm_ops pm_ops = {
