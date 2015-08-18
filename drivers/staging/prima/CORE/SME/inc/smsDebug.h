@@ -60,6 +60,13 @@
 #include "utilsApi.h"
 #include "sirDebug.h"
 
+#ifdef WLAN_DEBUG
+
 void smsLog(tpAniSirGlobal pMac, tANI_U32 loglevel, const char *pString,...); 
 
+#else
+#define smsLog(arg...)
+#define pmcLog(arg...)
+#endif
 #endif // __HAL_DEBUG_H__
+
