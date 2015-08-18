@@ -4429,6 +4429,7 @@ static int iw_get_char_setnone(struct net_device *dev, struct iw_request_info *i
                      pResetStats->totalFWHearbeatFailures,
                      pResetStats->totalUnknownExceptions
                      );
+
             wrqu->data.length = strlen(extra)+1;
             break;
         }

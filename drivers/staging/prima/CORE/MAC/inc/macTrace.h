@@ -66,6 +66,7 @@
 #define CASE_RETURN_STRING( str )           \
     case ( ( str ) ): return( (tANI_U8*)(#str) ); break \
 
+
 #define MAC_TRACE_GET_MODULE_ID(data) ((data >> 8) & 0xff)
 #define MAC_TRACE_GET_MSG_ID(data)       (data & 0xffff)
 
@@ -123,8 +124,6 @@ tANI_U8* macTraceGetModuleString( tANI_U8 moduleId);
 tANI_U8* macTraceGetInfoLogString( tANI_U16 infoLog );
 eHalStatus pe_AcquireGlobalLock( tAniSirLim *psPe);
 eHalStatus pe_ReleaseGlobalLock( tAniSirLim *psPe);
-
-
 
 #endif
 

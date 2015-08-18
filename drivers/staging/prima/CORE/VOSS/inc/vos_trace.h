@@ -106,6 +106,9 @@ typedef enum
 
 #include  <i_vos_trace.h>   
 
+#define CASE_RETURN_STRING( str ) { }
+
+
 /*------------------------------------------------------------------------- 
   Function declarations and documenation
   ------------------------------------------------------------------------*/
