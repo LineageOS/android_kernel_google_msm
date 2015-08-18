@@ -91,39 +91,42 @@ typedef enum
    // not a real level.  Used to identify the maximum number of 
    // VOS_TRACE_LEVELs defined.
    VOS_TRACE_LEVEL_MAX   
-    
+
 } VOS_TRACE_LEVEL;
 
-/*-------------------------------------------------------------------------- 
+/*--------------------------------------------------------------------------
   Preprocessor definitions and constants
   ------------------------------------------------------------------------*/
 #define ASSERT_BUFFER_SIZE ( 512 )
 
 // below definition is obsolete and is no longer being used in BMP and WM
 // TODO: remove this once this is not used on Android
-#define VOS_ENABLE_TRACING 
+#define VOS_ENABLE_TRACING
 #define WCONN_TRACE_KMSG_LOG_BUFF
 
-#include  <i_vos_trace.h>   
+#include  <i_vos_trace.h>
 
-/*------------------------------------------------------------------------- 
+#define CASE_RETURN_STRING( str ) { }
+
+
+/*-------------------------------------------------------------------------
   Function declarations and documenation
   ------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------
-  
+
   \brief vos_trace_setLevel() - Set the trace level for a particular module
-  
+
   This is an external API that allows trace levels to be set for each module.
-  
-  \param level - trace level.   A member of the VOS_TRACE_LEVEL 
+
+  \param level - trace level.   A member of the VOS_TRACE_LEVEL
          enumeration indicating the severity of the condition causing the
-         trace message to be issued.   More severe conditions are more 
+         trace message to be issued.   More severe conditions are more
          likely to be logged.
-         
+
   \return  nothing
-    
+
   \sa
   --------------------------------------------------------------------------*/
 void vos_trace_setLevel( VOS_MODULE_ID module, VOS_TRACE_LEVEL level );
