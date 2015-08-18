@@ -50,7 +50,7 @@
    Copyright (C) 2006 Airgo Networks, Incorporated
  
    ========================================================================== */
-   
+
 #ifndef SMS_DEBUG_H__
 #define SMS_DEBUG_H__
 
@@ -60,6 +60,13 @@
 #include "utilsApi.h"
 #include "sirDebug.h"
 
-void smsLog(tpAniSirGlobal pMac, tANI_U32 loglevel, const char *pString,...); 
+#ifdef WLAN_DEBUG
 
+void smsLog(tpAniSirGlobal pMac, tANI_U32 loglevel, const char *pString,...);
+
+#else
+#define smsLog(arg...)
+#define pmcLog(arg...)
+#endif
 #endif // __HAL_DEBUG_H__
+

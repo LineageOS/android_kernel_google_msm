@@ -101,20 +101,23 @@ typedef enum
 
 // below definition is obsolete and is no longer being used in BMP and WM
 // TODO: remove this once this is not used on Android
-#define VOS_ENABLE_TRACING 
+#define VOS_ENABLE_TRACING
 #define WCONN_TRACE_KMSG_LOG_BUFF
 
-#include  <i_vos_trace.h>   
+#include  <i_vos_trace.h>
 
-/*------------------------------------------------------------------------- 
+#define CASE_RETURN_STRING( str ) { }
+
+
+/*-------------------------------------------------------------------------
   Function declarations and documenation
   ------------------------------------------------------------------------*/
 
 
 /*----------------------------------------------------------------------------
-  
+
   \brief vos_trace_setLevel() - Set the trace level for a particular module
-  
+
   This is an external API that allows trace levels to be set for each module.
   
   \param level - trace level.   A member of the VOS_TRACE_LEVEL 
