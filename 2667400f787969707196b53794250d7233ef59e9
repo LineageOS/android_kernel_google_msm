@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_5103960e",
+        "filename": "drivers/input/touchscreen/lge_touch_core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1830,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-06T00:59:43Z",
+      "side": 1,
+      "message": "Does this need to be moved?",
+      "revId": "2667400f787969707196b53794250d7233ef59e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_4ee1b3d0",
+        "filename": "drivers/input/touchscreen/touch_synaptics.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-06T00:59:43Z",
+      "side": 1,
+      "message": "Didn\u0027t look like you needed to change the spacing here, just add the {",
+      "revId": "2667400f787969707196b53794250d7233ef59e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_6edc6f18",
+        "filename": "drivers/input/touchscreen/touch_synaptics.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-06T00:59:43Z",
+      "side": 1,
+      "message": "spacing, this should be 8 space hard tabs",
+      "revId": "2667400f787969707196b53794250d7233ef59e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_8e8e7bce",
+        "filename": "drivers/input/touchscreen/touch_synaptics.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-06T00:59:43Z",
+      "side": 1,
+      "message": "I\u0027m not opposed to changing this to strlcpy, but it\u0027s also a little outside the intended patch.",
+      "revId": "2667400f787969707196b53794250d7233ef59e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_2ee667ea",
+        "filename": "drivers/input/touchscreen/touch_synaptics.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1101,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-06T00:59:43Z",
+      "side": 1,
+      "message": "While it is probably more correct to return EINVAL, it doesn\u0027t appear this change is necessary in this patchset.",
+      "revId": "2667400f787969707196b53794250d7233ef59e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
