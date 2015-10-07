@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_a85fe70c",
+        "filename": "drivers/input/touchscreen/lge_touch_core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1831,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-10-07T23:13:25Z",
+      "side": 1,
+      "message": "I think I missed it if you were explaining why you did this, but I\u0027m not sure why changing the ordering of this would have an effect on the below supported capabilities.",
+      "revId": "80c161874d216fbb484259784bab007af47856b7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
