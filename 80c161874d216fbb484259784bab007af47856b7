@@ -16,6 +16,24 @@
       "revId": "80c161874d216fbb484259784bab007af47856b7",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_a38ee8cd",
+        "filename": "drivers/input/touchscreen/lge_touch_core.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1831,
+      "author": {
+        "id": 14144
+      },
+      "writtenOn": "2015-10-08T11:08:34Z",
+      "side": 1,
+      "message": "Sorry, I didn\u0027t really explain.\n\nA couple of lines down from here the driver checks caps-\u003eis_pressure_supported and calls input_set_abs_params(... ABS_MT_PRESSURE ..) if the flag is set. This is actually the call which causes Android 5 to not register touches from the wonky touch controller.\n\ntouch_ic_init() calls through to the code which actually interrogates the product_id and can determine if the touchscreen is a known model or not. This patch clears is_pressure_supported if it\u0027s not a known model.\n\nSo the patch has call to touch_ic_init() before it checks the capabilities field, as the field might be changed as a side effect of touch_ic_init().\n\nI don\u0027t think there should be any ill effects from moving it up a few lines in this way, touch_ic_init() is called from a few places and it seems like an \"ensure the hardware has been queried by this point\" kind of function - although it\u0027s hard to tell exactly what the intention of the original driver authors were in some places! :)",
+      "parentUuid": "7f287b81_a85fe70c",
+      "revId": "80c161874d216fbb484259784bab007af47856b7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
