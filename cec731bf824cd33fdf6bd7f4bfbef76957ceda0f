@@ -45,6 +45,30 @@
       "revId": "cec731bf824cd33fdf6bd7f4bfbef76957ceda0f",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_c52d6e47",
+        "filename": "arch/arm/configs/cyanogen_flo_defconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 1725,
+      "author": {
+        "id": 4550
+      },
+      "writtenOn": "2015-10-12T22:11:17Z",
+      "side": 1,
+      "message": "These should be not set according to https://github.com/CyanogenMod/android_kernel_google_msm/commit/4e394da07511216aa0bd5e96946dda8345ea7b12",
+      "parentUuid": "7f287b81_055496c9",
+      "range": {
+        "startLine": 1725,
+        "startChar": 2,
+        "endLine": 1725,
+        "endChar": 16
+      },
+      "revId": "cec731bf824cd33fdf6bd7f4bfbef76957ceda0f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
