@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f287b81_25479220",
+        "filename": "arch/arm/configs/cyanogen_flo_defconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 1724,
+      "author": {
+        "id": 2644
+      },
+      "writtenOn": "2015-10-12T21:49:33Z",
+      "side": 1,
+      "message": "is it set or not set? \nIt is set 3 lines below: \n1727 CONFIG_DEVMEM\u003dy",
+      "range": {
+        "startLine": 1724,
+        "startChar": 0,
+        "endLine": 1724,
+        "endChar": 26
+      },
+      "revId": "cec731bf824cd33fdf6bd7f4bfbef76957ceda0f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f287b81_055496c9",
+        "filename": "arch/arm/configs/cyanogen_flo_defconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 1725,
+      "author": {
+        "id": 2644
+      },
+      "writtenOn": "2015-10-12T21:49:33Z",
+      "side": 1,
+      "message": "is it set or not set? \nIt is set 3 lines below: \n1728 CONFIG_DEVKMEM\u003dy",
+      "range": {
+        "startLine": 1725,
+        "startChar": 2,
+        "endLine": 1725,
+        "endChar": 16
+      },
+      "revId": "cec731bf824cd33fdf6bd7f4bfbef76957ceda0f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
