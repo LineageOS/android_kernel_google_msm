@@ -176,6 +176,7 @@ struct ipv6_devconf {
 	__s32		accept_dad;
 	__s32		force_tllao;
 	__s32		use_oif_addrs_only;
+	__s32		drop_unsolicited_na;
 	void		*sysctl;
 };
 
@@ -221,6 +222,7 @@ enum {
 	DEVCONF_USE_OPTIMISTIC,
 	DEVCONF_USE_OIF_ADDRS_ONLY,
 	DEVCONF_DROP_UNICAST_IN_L2_MULTICAST,
+	DEVCONF_DROP_UNSOLICITED_NA,
 	DEVCONF_MAX
 };
 
