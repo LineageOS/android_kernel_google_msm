@@ -3243,8 +3243,7 @@ static int mdp_probe(struct platform_device *pdev)
 void mdp_footswitch_ctrl(boolean on)
 {
 	mutex_lock(&mdp_suspend_mutex);
-	if (!mdp_suspended || mdp4_extn_disp || !footswitch ||
-		mdp_rev <= MDP_REV_41) {
+	if (!footswitch || mdp_rev <= MDP_REV_41) {
 		mutex_unlock(&mdp_suspend_mutex);
 		return;
 	}
