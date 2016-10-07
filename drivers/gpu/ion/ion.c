@@ -950,7 +950,7 @@ static int ion_debug_client_show(struct seq_file *s, void *unused)
 						     node);
 		enum ion_heap_type type = handle->buffer->heap->type;
 
-		seq_printf(s, "%16.16s: %16x : %16d : %12p",
+		seq_printf(s, "%16.16s: %16x : %16d : %12pK",
 				handle->buffer->heap->name,
 				handle->buffer->size,
 				atomic_read(&handle->ref.refcount),
