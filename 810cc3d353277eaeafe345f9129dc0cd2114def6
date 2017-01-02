@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa3479d7_b2752034",
+        "filename": "arch/arm/configs/lineage_flo_defconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 11604
+      },
+      "writtenOn": "2017-01-02T09:14:28Z",
+      "side": 1,
+      "message": "change this to -lineageos",
+      "revId": "810cc3d353277eaeafe345f9129dc0cd2114def6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
