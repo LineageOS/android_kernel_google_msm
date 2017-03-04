@@ -1742,73 +1742,164 @@ static int qcedev_vbuf_ablk_cipher(struct qcedev_async_req *areq,
 
 }
 
-static int qcedev_check_cipher_params(struct qcedev_cipher_op_req *req,
+static int qcedev_check_cipher_key(struct qcedev_cipher_op_req *req,
 						struct qcedev_control *podev)
 {
-	if ((req->entries == 0) || (req->data_len == 0))
-		goto error;
-	if ((req->alg >= QCEDEV_ALG_LAST) ||
-		(req->mode >= QCEDEV_AES_DES_MODE_LAST))
-		goto error;
-	if (req->alg == QCEDEV_ALG_AES) {
-		if ((req->mode == QCEDEV_AES_MODE_XTS) &&
-					(!podev->ce_support.aes_xts))
-			goto error;
-		/* if intending to use HW key make sure key fields are set
-		 * correctly and HW key is indeed supported in target
-		 */
-		if (req->encklen == 0) {
-			int i;
-			for (i = 0; i < QCEDEV_MAX_KEY_SIZE; i++)
-				if (req->enckey[i])
-					goto error;
-			if ((req->op != QCEDEV_OPER_ENC_NO_KEY) &&
-				(req->op != QCEDEV_OPER_DEC_NO_KEY))
-				if (!podev->platform_support.hw_key_support)
-					goto error;
+	/* if intending to use HW key make sure key fields are set
+	 * correctly and HW key is indeed supported in target
+	 */
+	if (req->encklen == 0) {
+		int i;
+		for (i = 0; i < QCEDEV_MAX_KEY_SIZE; i++) {
+			if (req->enckey[i]) {
+				pr_err("%s: Invalid key: non-zero key input\n",
+								__func__);
+				goto error;
+			}
+		}
+		if ((req->op != QCEDEV_OPER_ENC_NO_KEY) &&
+			(req->op != QCEDEV_OPER_DEC_NO_KEY))
+			if (!podev->platform_support.hw_key_support) {
+				pr_err("%s: Invalid op %d\n", __func__,
+						(uint32_t)req->op);
+				goto error;
+			}
+	} else {
+		if (req->encklen == QCEDEV_AES_KEY_192) {
+			if (!podev->ce_support.aes_key_192) {
+				pr_err("%s: AES-192 not supported\n", __func__);
+				goto error;
+			}
 		} else {
-			if (req->encklen == QCEDEV_AES_KEY_192) {
-				if (!podev->ce_support.aes_key_192)
+			/* if not using HW key make sure key
+			 * length is valid
+			 */
+			if ((req->mode == QCEDEV_AES_MODE_XTS)) {
+				if ((req->encklen != QCEDEV_AES_KEY_128*2) &&
+				(req->encklen != QCEDEV_AES_KEY_256*2)) {
+					pr_err("%s: unsupported key size: %d\n",
+							__func__, req->encklen);
 					goto error;
+				}
 			} else {
-				/* if not using HW key make sure key
-				 * length is valid
-				 */
-				if (!((req->encklen == QCEDEV_AES_KEY_128) ||
-					(req->encklen == QCEDEV_AES_KEY_256)))
+				if ((req->encklen != QCEDEV_AES_KEY_128) &&
+					(req->encklen != QCEDEV_AES_KEY_256)) {
+					pr_err("%s: unsupported key size %d\n",
+							__func__, req->encklen);
 					goto error;
+				}
 			}
 		}
 	}
+	return 0;
+error:
+	return -EINVAL;
+}
+
+static int qcedev_check_cipher_params(struct qcedev_cipher_op_req *req,
+						struct qcedev_control *podev)
+{
+	uint32_t total = 0;
+	uint32_t i;
+
+	if (req->use_pmem) {
+		pr_err("%s: Use of PMEM is not supported\n", __func__);
+		goto error;
+	}
+	if ((req->entries == 0) || (req->data_len == 0) ||
+			(req->entries > QCEDEV_MAX_BUFFERS)) {
+		pr_err("%s: Invalid cipher length/entries\n", __func__);
+		goto error;
+	}
+	if ((req->alg >= QCEDEV_ALG_LAST) ||
+		(req->mode >= QCEDEV_AES_DES_MODE_LAST)) {
+		pr_err("%s: Invalid algorithm %d\n", __func__,
+						(uint32_t)req->alg);
+		goto error;
+	}
+	if ((req->mode == QCEDEV_AES_MODE_XTS) &&
+				(!podev->ce_support.aes_xts)) {
+		pr_err("%s: XTS algorithm is not supported\n", __func__);
+		goto error;
+	}
+	if (req->alg == QCEDEV_ALG_AES) {
+		if (qcedev_check_cipher_key(req, podev))
+			goto error;
+
+	}
 	/* if using a byteoffset, make sure it is CTR mode using vbuf */
 	if (req->byteoffset) {
-		if (req->mode != QCEDEV_AES_MODE_CTR)
+		if (req->mode != QCEDEV_AES_MODE_CTR) {
+			pr_err("%s: Operation on byte offset not supported\n",
+								 __func__);
 			goto error;
-		else { /* if using CTR mode make sure not using Pmem */
-			if (req->use_pmem)
-				goto error;
 		}
 		if (req->byteoffset >= AES_CE_BLOCK_SIZE) {
 			pr_err("%s: Invalid byte offset\n", __func__);
 			goto error;
 		}
 	}
-	/* if using PMEM with non-zero byteoffset, ensure it is in_place_op */
-	if (req->use_pmem) {
-		if (!req->in_place_op)
-			goto error;
-	}
-	/* Ensure zer ivlen for ECB  mode  */
-	if (req->ivlen != 0) {
-		if ((req->mode == QCEDEV_AES_MODE_ECB) ||
-				(req->mode == QCEDEV_DES_MODE_ECB))
-			goto error;
-	} else {
-		if ((req->mode != QCEDEV_AES_MODE_ECB) &&
-				(req->mode != QCEDEV_DES_MODE_ECB))
-			goto error;
+
+	if (req->data_len < req->byteoffset) {
+		pr_err("%s: req data length %u is less than byteoffset %u\n",
+				__func__, req->data_len, req->byteoffset);
+		goto error;
 	}
 
+	/* Ensure IV size */
+	if (req->ivlen > QCEDEV_MAX_IV_SIZE) {
+		pr_err("%s: ivlen is not correct: %u\n", __func__, req->ivlen);
+		goto error;
+	}
+
+	/* Ensure Key size */
+	if (req->encklen > QCEDEV_MAX_KEY_SIZE) {
+		pr_err("%s: Klen is not correct: %u\n", __func__, req->encklen);
+		goto error;
+	}
+
+	/* Ensure zer ivlen for ECB  mode  */
+	if (req->ivlen > 0) {
+		if ((req->mode == QCEDEV_AES_MODE_ECB) ||
+				(req->mode == QCEDEV_DES_MODE_ECB)) {
+			pr_err("%s: Expecting a zero length IV\n", __func__);
+			goto error;
+		}
+	} else {
+		if ((req->mode != QCEDEV_AES_MODE_ECB) &&
+				(req->mode != QCEDEV_DES_MODE_ECB)) {
+			pr_err("%s: Expecting a non-zero ength IV\n", __func__);
+			goto error;
+		}
+	}
+	/* Check for sum of all dst length is equal to data_len  */
+	for (i = 0; i < req->entries; i++) {
+		if (req->vbuf.dst[i].len >= U32_MAX - total) {
+			pr_err("%s: Integer overflow on total req dst vbuf length\n",
+				__func__);
+			goto error;
+		}
+		total += req->vbuf.dst[i].len;
+	}
+	if (total != req->data_len) {
+		pr_err("%s: Total (i=%d) dst(%d) buf size != data_len (%d)\n",
+			__func__, i, total, req->data_len);
+		goto error;
+	}
+	/* Check for sum of all src length is equal to data_len  */
+	for (i = 0, total = 0; i < req->entries; i++) {
+		if (req->vbuf.src[i].len > U32_MAX - total) {
+			pr_err("%s: Integer overflow on total req src vbuf length\n",
+				__func__);
+			goto error;
+		}
+		total += req->vbuf.src[i].len;
+	}
+	if (total != req->data_len) {
+		pr_err("%s: Total src(%d) buf size != data_len (%d)\n",
+			__func__, total, req->data_len);
+		goto error;
+	}
 	return 0;
 error:
 	return -EINVAL;
