@@ -536,6 +536,48 @@ static int ioctl_fsthaw(struct file *filp)
 	return thaw_super(sb);
 }
 
+static int ioctl_set_hide_su(struct file *filp, unsigned long arg)
+{
+	struct inode *inode = filp->f_path.dentry->d_inode;
+	unsigned int val;
+
+	/* Keep this hidden */
+	if (!capable(CAP_SYS_ADMIN))
+		return -ENOTTY;
+
+	if (!S_ISDIR(inode->i_mode))
+		return -EOPNOTSUPP;
+
+	if (copy_from_user(&val, (void __user *)arg, sizeof(val)))
+		return -EFAULT;
+
+	if (val)
+		inode->i_flags |= S_HIDESU;
+	else
+		inode->i_flags &= ~S_HIDESU;
+
+	return 0;
+}
+
+static int ioctl_get_hide_su(struct file *filp, unsigned long arg)
+{
+	struct inode *inode = filp->f_path.dentry->d_inode;
+	unsigned int val;
+
+	/* Keep this hidden */
+	if (!capable(CAP_SYS_ADMIN))
+		return -ENOTTY;
+
+	if (!S_ISDIR(inode->i_mode))
+		return -EOPNOTSUPP;
+
+	val = !!(inode->i_flags & S_HIDESU);
+	if (copy_to_user((void __user *)arg, &val, sizeof(val)))
+		return -EFAULT;
+
+	return 0;
+}
+
 /*
  * When you add any new common ioctls to the switches above and below
  * please update compat_sys_ioctl() too.
@@ -590,6 +632,12 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
 
 	case FIGETBSZ:
 		return put_user(inode->i_sb->s_blocksize, argp);
+
+	case FS_IOC_GETHIDESU:
+		return ioctl_get_hide_su(filp, arg);
+
+	case FS_IOC_SETHIDESU:
+		return ioctl_set_hide_su(filp, arg);
 
 	default:
 		if (S_ISREG(inode->i_mode))

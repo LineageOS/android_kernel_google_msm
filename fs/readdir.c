@@ -76,6 +76,7 @@ struct old_linux_dirent {
 struct readdir_callback {
 	struct old_linux_dirent __user * dirent;
 	int result;
+	bool hide_su;
 };
 
 static int fillonedir(void * __buf, const char * name, int namlen, loff_t offset,
@@ -92,7 +93,7 @@ static int fillonedir(void * __buf, const char * name, int namlen, loff_t offset
 		buf->result = -EOVERFLOW;
 		return -EOVERFLOW;
 	}
-	if (hide_name(name, namlen))
+	if (buf->hide_su && hide_name(name, namlen))
 		return 0;
 	buf->result++;
 	dirent = buf->dirent;
@@ -126,6 +127,7 @@ SYSCALL_DEFINE3(old_readdir, unsigned int, fd,
 
 	buf.result = 0;
 	buf.dirent = dirent;
+	buf.hide_su = IS_SU_HIDDEN(file->f_path.dentry->d_inode);
 
 	error = vfs_readdir(file, fillonedir, &buf);
 	if (buf.result)
@@ -154,6 +156,7 @@ struct getdents_callback {
 	struct linux_dirent __user * previous;
 	int count;
 	int error;
+	bool hide_su;
 };
 
 static int filldir(void * __buf, const char * name, int namlen, loff_t offset,
@@ -173,7 +176,7 @@ static int filldir(void * __buf, const char * name, int namlen, loff_t offset,
 		buf->error = -EOVERFLOW;
 		return -EOVERFLOW;
 	}
-	if (hide_name(name, namlen))
+	if (buf->hide_su && hide_name(name, namlen))
 		return 0;
 	dirent = buf->previous;
 	if (dirent) {
@@ -222,6 +225,7 @@ SYSCALL_DEFINE3(getdents, unsigned int, fd,
 	buf.previous = NULL;
 	buf.count = count;
 	buf.error = 0;
+	buf.hide_su = IS_SU_HIDDEN(file->f_path.dentry->d_inode);
 
 	error = vfs_readdir(file, filldir, &buf);
 	if (error >= 0)
@@ -243,6 +247,7 @@ struct getdents_callback64 {
 	struct linux_dirent64 __user * previous;
 	int count;
 	int error;
+	bool hide_su;
 };
 
 static int filldir64(void * __buf, const char * name, int namlen, loff_t offset,
@@ -256,7 +261,7 @@ static int filldir64(void * __buf, const char * name, int namlen, loff_t offset,
 	buf->error = -EINVAL;	/* only used if we fail.. */
 	if (reclen > buf->count)
 		return -EINVAL;
-	if (hide_name(name, namlen))
+	if (buf->hide_su && hide_name(name, namlen))
 		return 0;
 	dirent = buf->previous;
 	if (dirent) {
@@ -307,6 +312,7 @@ SYSCALL_DEFINE3(getdents64, unsigned int, fd,
 	buf.previous = NULL;
 	buf.count = count;
 	buf.error = 0;
+	buf.hide_su = IS_SU_HIDDEN(file->f_path.dentry->d_inode);
 
 	error = vfs_readdir(file, filldir64, &buf);
 	if (error >= 0)
