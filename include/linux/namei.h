@@ -78,7 +78,7 @@ extern int kern_path(const char *, unsigned, struct path *);
 
 extern struct dentry *kern_path_create(int, const char *, struct path *, int);
 extern struct dentry *user_path_create(int, const char __user *, struct path *, int);
-extern int kern_path_parent(const char *, struct nameidata *);
+extern struct dentry *kern_path_locked(const char *, struct path *);
 extern int vfs_path_lookup(struct dentry *, struct vfsmount *,
 			   const char *, unsigned int, struct path *);
 
@@ -86,6 +86,7 @@ extern struct file *lookup_instantiate_filp(struct nameidata *nd, struct dentry 
 		int (*open)(struct inode *, struct file *));
 
 extern struct dentry *lookup_one_len(const char *, struct dentry *, int);
+extern struct dentry *lookup_one_len2(const char *, struct vfsmount *mnt, struct dentry *, int);
 
 extern int follow_down_one(struct path *);
 extern int follow_down(struct path *);
