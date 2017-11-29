@@ -2596,12 +2596,13 @@ static tANI_S32 hdd_ProcessGENIE(hdd_adapter_t *pAdapter,
                 u_int8_t *gen_ie) 
 {
     tHalHandle halHandle = WLAN_HDD_GET_HAL_CTX(pAdapter);
-    eHalStatus result; 
-    tDot11fIERSN dot11RSNIE; 
-    tDot11fIEWPA dot11WPAIE; 
-    tANI_U32 i; 
-    tANI_U8 *pRsnIe; 
-    tANI_U16 RSNIeLen; 
+    eHalStatus result;
+    tDot11fIERSN dot11RSNIE;
+    tDot11fIEWPA dot11WPAIE;
+    tANI_U32 i;
+    tANI_U32 status;
+    tANI_U8 *pRsnIe;
+    tANI_U16 RSNIeLen;
     tPmkidCacheInfo PMKIDCache[4]; // Local transfer memory
 
     /* Clear struct of tDot11fIERSN and tDot11fIEWPA specifically setting present
@@ -2622,16 +2623,23 @@ static tANI_S32 hdd_ProcessGENIE(hdd_adapter_t *pAdapter,
         {
             return -EINVAL;
         }
-        // Skip past the EID byte and length byte  
-        pRsnIe = gen_ie + 2; 
-        RSNIeLen = gen_ie_len - 2; 
-        // Unpack the RSN IE 
-        dot11fUnpackIeRSN((tpAniSirGlobal) halHandle, 
-                            pRsnIe, 
-                            RSNIeLen, 
+        // Skip past the EID byte and length byte
+        pRsnIe = gen_ie + 2;
+        RSNIeLen = gen_ie_len - 2;
+        // Unpack the RSN IE
+        status = dot11fUnpackIeRSN((tpAniSirGlobal) halHandle,
+                            pRsnIe,
+                            RSNIeLen,
                             &dot11RSNIE);
-        // Copy out the encryption and authentication types 
-        hddLog(LOG1, FL("%s: pairwise cipher suite count: %d"), 
+        if (DOT11F_FAILED(status))
+        {
+            hddLog(LOGE,
+                       FL("Parse failure in hdd_ProcessGENIE (0x%08x)"),
+                       status);
+            return -EINVAL;
+        }
+        // Copy out the encryption and authentication types
+        hddLog(LOG1, FL("%s: pairwise cipher suite count: %d"),
                 __func__, dot11RSNIE.pwise_cipher_suite_count );
         hddLog(LOG1, FL("%s: authentication suite count: %d"), 
                 __func__, dot11RSNIE.akm_suite_count);
