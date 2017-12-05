@@ -292,6 +292,7 @@ static struct file_system_type debug_fs_type = {
 	.mount =	debug_mount,
 	.kill_sb =	kill_litter_super,
 };
+MODULE_ALIAS_FS("debugfs");
 
 static int debugfs_create_by_name(const char *name, umode_t mode,
 				  struct dentry *parent,
@@ -553,7 +554,7 @@ void debugfs_remove_recursive(struct dentry *dentry)
 			mutex_lock(&parent->d_inode->i_mutex);
 		}
 		child = list_entry(parent->d_subdirs.next, struct dentry,
-				d_u.d_child);
+				d_child);
  next_sibling:
 
 		/*
@@ -567,14 +568,14 @@ void debugfs_remove_recursive(struct dentry *dentry)
 			continue;
 		}
 		__debugfs_remove(child, parent);
-		if (parent->d_subdirs.next == &child->d_u.d_child) {
+		if (parent->d_subdirs.next == &child->d_child) {
 			/*
 			 * Try the next sibling.
 			 */
-			if (child->d_u.d_child.next != &parent->d_subdirs) {
-				child = list_entry(child->d_u.d_child.next,
+			if (child->d_child.next != &parent->d_subdirs) {
+				child = list_entry(child->d_child.next,
 						   struct dentry,
-						   d_u.d_child);
+						   d_child);
 				goto next_sibling;
 			}
 
