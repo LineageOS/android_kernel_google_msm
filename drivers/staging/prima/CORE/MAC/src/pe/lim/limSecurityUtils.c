@@ -571,9 +571,9 @@ limEncryptAuthFrame(tpAniSirGlobal pMac, tANI_U8 keyId, tANI_U8 *pKey, tANI_U8 *
     palCopyMemory( pMac->hHdd, (tANI_U8 *) &seed[3], pKey, keyLength - 3);
 
     // Compute CRC-32 and place them in last 4 bytes of plain text
-    limComputeCrc32(icv, pPlainText, sizeof(tSirMacAuthFrameBody));
+    limComputeCrc32(icv, pPlainText, framelen);
 
-    palCopyMemory( pMac->hHdd, pPlainText + sizeof(tSirMacAuthFrameBody),
+    palCopyMemory( pMac->hHdd, pPlainText + framelen,
                   icv, SIR_MAC_WEP_ICV_LENGTH);
 
     // Run RC4 on plain text with the seed
