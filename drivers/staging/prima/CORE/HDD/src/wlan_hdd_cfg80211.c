@@ -5255,7 +5255,14 @@ int wlan_hdd_cfg80211_set_ie( hdd_adapter_t *pAdapter,
         elementId = *genie++;
         eLen  = *genie++;
         remLen -= 2;
-
+        
+        /* Sanity check on eLen */
+        if (eLen > remLen) {
+            hddLog(VOS_TRACE_LEVEL_FATAL, "%s: Invalid IE length[%d] for IE[0x%X]",
+                    __func__, eLen, elementId);
+            VOS_ASSERT(0);
+            return -EINVAL;
+        }
         hddLog(VOS_TRACE_LEVEL_INFO, "%s: IE[0x%X], LEN[%d]\n",
             __func__, elementId, eLen);
 
