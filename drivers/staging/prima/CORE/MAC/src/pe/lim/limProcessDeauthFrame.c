@@ -94,11 +94,18 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
     tpDphHashNode     pStaDs;
     tpPESession       pRoamSessionEntry=NULL;
     tANI_U8           roamSessionId;
-
+    tANI_U32          frameLen;
 
     pHdr = WDA_GET_RX_MAC_HEADER(pRxPacketInfo);
 
     pBody = WDA_GET_RX_MPDU_DATA(pRxPacketInfo);
+
+    frameLen = WDA_GET_RX_PAYLOAD_LEN(pRxPacketInfo);
+    if (frameLen < sizeof(reasonCode)) {
+        PELOGE(limLog(pMac, LOGE,
+                      FL("received invalid framelen %d"), frameLen);)
+        return;
+    }
 
 
     if ((eLIM_STA_ROLE == psessionEntry->limSystemRole) && (eLIM_SME_WT_DEAUTH_STATE == psessionEntry->limSmeState))
@@ -126,6 +133,23 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
 
         return;
     }
+
+#ifdef WLAN_FEATURE_11W
+    /* PMF: If this session is a PMF session, then ensure that this frame was protected */
+    if(psessionEntry->limRmfEnabled  && (WDA_GET_RX_DPU_FEEDBACK(pRxPacketInfo) & DPU_FEEDBACK_UNPROTECTED_ERROR))
+    {
+        PELOGE(limLog(pMac, LOGE, FL("received an unprotected deauth from AP"));)
+        // If the frame received is unprotected, forward it to the supplicant to initiate
+        // an SA query
+
+        //send the unprotected frame indication to SME
+        limSendSmeUnprotectedMgmtFrameInd( pMac, pHdr->fc.subType,
+                                           (tANI_U8*)pHdr, (frameLen + sizeof(tSirMacMgmtHdr)),
+                                           psessionEntry->smeSessionId, psessionEntry);
+        return;
+    }
+#endif
+
     // Get reasonCode from Deauthentication frame body
     reasonCode = sirReadU16(pBody);
 
