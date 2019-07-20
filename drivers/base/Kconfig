@@ -249,6 +249,13 @@ config SW_SYNC_USER
          *WARNING* improper use of this can result in deadlocking kernel
 	 drivers from userspace.
 
+config SYNC_DEBUG
+	bool "Debug software synchronization"
+	default n
+	depends on SYNC
+	help
+	  This makes the sync driver keep track of fence names.
+
 config CMA
 	bool "Contiguous Memory Allocator (EXPERIMENTAL)"
 	depends on HAVE_DMA_CONTIGUOUS && HAVE_MEMBLOCK && EXPERIMENTAL

@@ -138,7 +138,7 @@ int kgsl_add_fence_event(struct kgsl_device *device,
 		goto fail_pt;
 	}
 
-	fence = sync_fence_create("kgsl-fence", pt);
+	fence = sync_fence_create("", pt);
 	if (fence == NULL) {
 		/* only destroy pt when not added to fence */
 		kgsl_sync_pt_destroy(pt);
