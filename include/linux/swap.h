@@ -297,7 +297,7 @@ static inline void scan_unevictable_unregister_node(struct node *node)
 
 extern int kswapd_run(int nid);
 extern void kswapd_stop(int nid);
-#ifdef CONFIG_CGROUP_MEM_RES_CTLR
+#ifdef CONFIG_MEMCG
 extern int mem_cgroup_swappiness(struct mem_cgroup *mem);
 #else
 static inline int mem_cgroup_swappiness(struct mem_cgroup *mem)
@@ -305,7 +305,7 @@ static inline int mem_cgroup_swappiness(struct mem_cgroup *mem)
 	return vm_swappiness;
 }
 #endif
-#ifdef CONFIG_CGROUP_MEM_RES_CTLR_SWAP
+#ifdef CONFIG_MEMCG_SWAP
 extern void mem_cgroup_uncharge_swap(swp_entry_t ent);
 #else
 static inline void mem_cgroup_uncharge_swap(swp_entry_t ent)
@@ -375,7 +375,8 @@ static inline void put_swap_token(struct mm_struct *mm)
 		__put_swap_token(mm);
 }
 
-#ifdef CONFIG_CGROUP_MEM_RES_CTLR
+#ifdef CONFIG_MEMCG
+
 extern void
 mem_cgroup_uncharge_swapcache(struct page *page, swp_entry_t ent, bool swapout);
 #else
