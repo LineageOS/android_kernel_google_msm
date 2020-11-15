@@ -280,7 +280,7 @@ void msm_restart(char mode, const char *cmd)
 			code = simple_strtoul(cmd + 4, NULL, 16) & 0xff;
 			__raw_writel(0x6f656d00 | code, restart_reason);
 		} else {
-			__raw_writel(0x77665501, restart_reason);
+			__raw_writel(0x12345678, restart_reason);
 		}
 	} else {
 		__raw_writel(0x77665501, restart_reason);
