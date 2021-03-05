@@ -872,6 +872,8 @@ WLANTL_AMSDUProcess
   v_U16_t         packetLength; 
   static v_U32_t  numAMSDUFrames;
   vos_pkt_t*      vosDataBuff;
+  uint8_t llc_hdr[6] = {0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00};
+
   /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
   /*------------------------------------------------------------------------
     Sanity check
@@ -950,6 +952,7 @@ WLANTL_AMSDUProcess
     pClientSTA->ucMPDUHeaderLen = ucMPDUHLen;
     memcpy(pClientSTA->aucMPDUHeader, MPDUHeaderAMSDUHeader, ucMPDUHLen);
     /* AMSDU header stored to handle garbage data within next frame */
+    pClientSTA->drop_amsdu = false;
   }
   else
   {
@@ -986,6 +989,25 @@ WLANTL_AMSDUProcess
     *ppVosDataBuff = NULL;
     return VOS_STATUS_SUCCESS; /*Not a transport error*/ 
   }
+
+  if (pClientSTA->drop_amsdu) {
+         vos_pkt_return_packet(vosDataBuff);
+         *ppVosDataBuff = NULL;
+         return VOS_STATUS_SUCCESS;
+  }
+
+  /**
+   * Set drop_amsdu flag and drop AMSDU subframe if AMSDU subframe DA
+   * is equal to LLC header
+   */
+   if (vos_mem_compare2(MPDUHeaderAMSDUHeader + ucMPDUHLen, llc_hdr, 6) == 0) {
+      pClientSTA->drop_amsdu = true;
+      vos_pkt_return_packet(vosDataBuff);
+      *ppVosDataBuff = NULL;
+      VOS_TRACE(VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_ERROR,
+                "WLAN TL:Invalid AMSDU frame - dropping");
+      return VOS_STATUS_SUCCESS;
+   }
 
   /* Find Padding and remove */
   memcpy(&subFrameLength, MPDUHeaderAMSDUHeader + ucMPDUHLen + WLANTL_AMSDU_SUBFRAME_LEN_OFFSET, sizeof(v_U16_t));
