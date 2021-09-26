@@ -326,22 +326,31 @@ static void android_work(struct work_struct *data)
 	}
 }
 
-static void android_enable(struct android_dev *dev)
+static int android_enable(struct android_dev *dev)
 {
 	struct usb_composite_dev *cdev = dev->cdev;
 	struct android_configuration *conf;
+	int err = 0;
 
 	if (WARN_ON(!dev->disable_depth))
-		return;
+		return err;
 
 	if (--dev->disable_depth == 0) {
 
-		list_for_each_entry(conf, &dev->configs, list_item)
-			usb_add_config(cdev, &conf->usb_config,
+		list_for_each_entry(conf, &dev->configs, list_item) {
+			err = usb_add_config(cdev, &conf->usb_config,
 						android_bind_config);
-
+			if (err < 0) {
+				pr_err("%s: usb_add_config failed : err: %d\n",
+						__func__, err);
+				dev->disable_depth++;
+				return err;
+			}
+		}
 		usb_gadget_connect(cdev->gadget);
 	}
+
+	return err;
 }
 
 static void android_disable(struct android_dev *dev)
@@ -1266,6 +1275,7 @@ static struct android_usb_function ptp_function = {
 	.init		= ptp_function_init,
 	.cleanup	= ptp_function_cleanup,
 	.bind_config	= ptp_function_bind_config,
+	.ctrlrequest	= mtp_function_ctrlrequest,
 };
 
 #ifdef CONFIG_USB_ANDROID_CDC_ECM
@@ -2073,7 +2083,9 @@ static int android_init_functions(struct android_usb_function **functions,
 	struct device_attribute **attrs;
 	struct device_attribute *attr;
 	int err = 0;
-	int index = 1; /* index 0 is for android0 device */
+	int index = 2; /* index 0 is for android0 device
+			* index 1 is for android1 device
+			*/
 
 	for (; (f = *functions++); index++) {
 		f->dev_name = kasprintf(GFP_KERNEL, "f_%s", f->name);
