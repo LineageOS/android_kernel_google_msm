@@ -16,6 +16,24 @@
       "message": "Just the commit, not the whitespace changes please.",
       "revId": "638aa36c9d39d06c76346bbcc22372bd5353fef1",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e871dec_e12a7dcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 24773
+      },
+      "writtenOn": "2023-08-20T18:09:07Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "7f2fa1b6_819e46e4",
+      "revId": "638aa36c9d39d06c76346bbcc22372bd5353fef1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
